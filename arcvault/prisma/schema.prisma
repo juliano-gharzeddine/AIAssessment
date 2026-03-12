@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  users            User[]
+  processedRecords ProcessedRecord[]
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  passwordHash String
+  name         String
+  role         Role        @default(DEPARTMENT)
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  reviewedRecords ProcessedRecord[] @relation("ReviewedBy")
+}
+
+enum Role {
+  REGULATOR
+  DEPARTMENT
+}
+
+model Request {
+  id          String        @id @default(cuid())
+  source      RequestSource
+  rawMessage  String
+  submittedAt DateTime      @default(now())
+
+  processedRecord ProcessedRecord?
+}
+
+enum RequestSource {
+  EMAIL
+  WEB_FORM
+  SUPPORT_PORTAL
+}
+
+model ProcessedRecord {
+  id        String  @id @default(cuid())
+  requestId String  @unique
+  request   Request @relation(fields: [requestId], references: [id])
+
+  category   Category
+  priority   Priority
+  confidence Float
+
+  coreIssue     String
+  identifiers   Json
+  urgencySignal String
+
+  departmentId  String?
+  department    Department? @relation(fields: [departmentId], references: [id])
+  routingReason String?
+
+  escalationFlag   Boolean @default(false)
+  escalationReason String?
+
+  status       RecordStatus @default(PENDING)
+  reviewedById String?
+  reviewedBy   User?        @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?
+  reviewNotes  String?
+
+  summary     String
+  processedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Category {
+  BUG_REPORT
+  FEATURE_REQUEST
+  BILLING_ISSUE
+  TECHNICAL_QUESTION
+  INCIDENT_OUTAGE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum RecordStatus {
+  PENDING
+  AUTO_ROUTED
+  PENDING_REVIEW
+  MANUALLY_ROUTED
+  RESOLVED
+}
