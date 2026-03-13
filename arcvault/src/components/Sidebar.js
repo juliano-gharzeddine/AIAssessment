@@ -4,32 +4,24 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { LogoutIcon, MenuIcon } from "@/components/icons";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function Sidebar({ title, subtitle, items = [], footer }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [collapsed, setCollapsed] = useState(false);
 
+  const currentPath = useMemo(() => {
+    const query = searchParams?.toString();
+    return query ? `${pathname}?${query}` : pathname;
+  }, [pathname, searchParams]);
+
   function isItemActive(item) {
-    const [itemPath, itemQueryString] = item.href.split("?");
-    if (itemPath !== pathname) {
-      return false;
+    if (typeof item.isActive === "function") {
+      return item.isActive({ pathname, search: searchParams });
     }
 
-    if (!itemQueryString) {
-      return !searchParams?.toString();
-    }
-
-    const itemQuery = new URLSearchParams(itemQueryString);
-
-    for (const [key, value] of itemQuery.entries()) {
-      if (searchParams.get(key) !== value) {
-        return false;
-      }
-    }
-
-    return true;
+    return currentPath === item.href;
   }
 
   return (

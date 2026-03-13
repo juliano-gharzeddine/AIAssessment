@@ -33,10 +33,12 @@ export default async function RegulatorPage({ searchParams }) {
             href: "/regulator",
             label: "Pending Review",
             count: pendingCount,
+            isActive: ({ pathname, search }) => pathname === "/regulator" && search.get("view") !== "all",
           },
           {
             href: "/regulator?view=all",
             label: "All Records",
+            isActive: ({ pathname, search }) => pathname === "/regulator" && search.get("view") === "all",
           },
         ]}
         footer={<p className="px-2 text-xs text-slate-500">{session.user.email}</p>}

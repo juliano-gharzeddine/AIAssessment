@@ -25,6 +25,7 @@ export default async function DashboardPage() {
             href: "/dashboard",
             label: "My Queue",
             count: records.filter((r) => r.status !== "RESOLVED").length,
+            isActive: ({ pathname }) => pathname === "/dashboard",
           },
         ]}
         footer={<p className="px-2 text-xs text-slate-500">{session.user.name}</p>}
