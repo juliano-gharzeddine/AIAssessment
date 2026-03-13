@@ -4,19 +4,19 @@ import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import PageHeader from "@/components/PageHeader";
 import RegulatorClient from "@/components/RegulatorClient";
-
 export default async function RegulatorPage({ searchParams }) {
-  const session = await auth();
-  if (!session || session.user.role !== "REGULATOR") redirect("/login");
-
-  const view = searchParams?.view === "all" ? "all" : "pending";
-  const filters = {
-    ...(searchParams?.category ? { category: searchParams.category } : {}),
-    ...(searchParams?.priority ? { priority: searchParams.priority } : {}),
-    ...(searchParams?.status ? { status: searchParams.status } : {}),
-  };
-
-  const where = view === "pending" ? { status: "PENDING_REVIEW" } : filters;
+    const session = await auth();
+    if (!session || session.user.role !== "REGULATOR") redirect("/login");
+  
+    const params = await searchParams;
+    const view = params?.view === "all" ? "all" : "pending";
+    const filters = {
+      ...(params?.category ? { category: params.category } : {}),
+      ...(params?.priority ? { priority: params.priority } : {}),
+      ...(params?.status ? { status: params.status } : {}),
+    };
+  
+    const where = view === "pending" ? { status: "PENDING_REVIEW" } : filters;
 
   const [pendingCount, records, departments] = await Promise.all([
     db.processedRecord.count({ where: { status: "PENDING_REVIEW" } }),
