@@ -13,24 +13,26 @@ export default function SubmitForm() {
   const [state, action, pending] = useActionState(submitRequestAction, initialState);
   const [message, setMessage] = useState("");
   const length = message.length;
-  const lengthColor = useMemo(() => (length < 50 ? "text-red-500" : "text-slate-500"), [length]);
+  const lengthColor = useMemo(() => (length < 50 ? "text-red-500" : "text-emerald-600"), [length]);
 
   if (state?.success) {
     return (
-      <Card className="mx-auto max-w-2xl p-8">
+      <Card className="mx-auto max-w-3xl rounded-3xl border border-slate-200 p-8">
         <h2 className="text-2xl font-semibold text-slate-900">Request submitted</h2>
         <p className="mt-2 text-slate-600">We'll get back to you shortly.</p>
-        <p className="mt-4 rounded-lg bg-slate-100 px-4 py-3 text-sm text-slate-700">Ticket reference: <span className="font-semibold">{state.ticketRef}</span></p>
+        <p className="mt-4 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-700">
+          Ticket reference: <span className="font-semibold">{state.ticketRef}</span>
+        </p>
       </Card>
     );
   }
 
   return (
-    <Card className="mx-auto max-w-2xl p-8">
+    <Card className="mx-auto max-w-3xl rounded-3xl border border-slate-200 p-8">
       <form action={action} className="space-y-5">
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">Source</label>
-          <Select name="source" defaultValue="WEB_FORM" required>
+          <Select name="source" defaultValue="WEB_FORM" required className="rounded-xl bg-slate-50">
             <option value="EMAIL">Email</option>
             <option value="WEB_FORM">Web Form</option>
             <option value="SUPPORT_PORTAL">Support Portal</option>
@@ -45,7 +47,7 @@ export default function SubmitForm() {
             minLength={50}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="min-h-44"
+            className="min-h-44 rounded-2xl bg-slate-50"
           />
           <div className="mt-1 flex items-center justify-between">
             <p className={`text-xs ${lengthColor}`}>{length}/50 minimum characters</p>
@@ -53,7 +55,7 @@ export default function SubmitForm() {
           </div>
         </div>
 
-        <Button type="submit" disabled={pending} className="w-full">
+        <Button type="submit" disabled={pending} className="w-full rounded-xl bg-blue-600 hover:bg-blue-700">
           {pending ? "Submitting..." : "Submit request"}
         </Button>
       </form>
