@@ -44,8 +44,19 @@ model Request {
   submittedAt DateTime      @default(now())
   userId      String?
   user        User?         @relation(fields: [userId], references: [id])
+  processed   Boolean       @default(false)
 
   processedRecord ProcessedRecord?
+  pipelineErrors  PipelineError[]
+}
+
+model PipelineError {
+  id        String   @id @default(cuid())
+  requestId String
+  request   Request  @relation(fields: [requestId], references: [id])
+  step      String
+  message   String
+  createdAt DateTime @default(now())
 }
 
 enum RequestSource {

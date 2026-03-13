@@ -5,6 +5,23 @@ import Sidebar from "@/components/Sidebar";
 import PageHeader from "@/components/PageHeader";
 import RegulatorClient from "@/components/RegulatorClient";
 
+// Helper function to create items array *without* passing functions
+function getSidebarItems(pendingCount, view) {
+  return [
+    {
+      href: "/regulator",
+      label: "Pending Review",
+      count: pendingCount,
+      active: view !== "all",
+    },
+    {
+      href: "/regulator?view=all",
+      label: "All Records",
+      active: view === "all",
+    },
+  ];
+}
+
 export default async function RegulatorPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "REGULATOR") redirect("/login");
@@ -28,24 +45,15 @@ export default async function RegulatorPage({ searchParams }) {
     db.department.findMany({ orderBy: { name: "asc" } }),
   ]);
 
+  // Supply only simple serializable properties to Sidebar.
+  const sidebarItems = getSidebarItems(pendingCount, view);
+
   return (
     <div className="flex min-h-screen bg-slate-100">
       <Sidebar
         title="ArcVault"
         subtitle="Regulator"
-        items={[
-          {
-            href: "/regulator",
-            label: "Pending Review",
-            count: pendingCount,
-            isActive: ({ pathname, search }) => pathname === "/regulator" && search.get("view") !== "all",
-          },
-          {
-            href: "/regulator?view=all",
-            label: "All Records",
-            isActive: ({ pathname, search }) => pathname === "/regulator" && search.get("view") === "all",
-          },
-        ]}
+        items={sidebarItems}
         footer={<p className="px-2 text-xs text-slate-500">{session.user.email}</p>}
       />
       <main className="flex-1 px-8 py-8">
