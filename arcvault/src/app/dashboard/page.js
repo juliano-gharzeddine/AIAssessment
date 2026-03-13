@@ -16,12 +16,18 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-100">
       <Sidebar
         title="ArcVault"
         subtitle={session.user.departmentSlug ?? "Department"}
-        items={[{ href: "/dashboard", label: "My Queue", count: records.filter((r) => r.status !== "RESOLVED").length }]}
-        footer={<p className="px-2 text-xs text-slate-300">{session.user.name}</p>}
+        items={[
+          {
+            href: "/dashboard",
+            label: "My Queue",
+            count: records.filter((r) => r.status !== "RESOLVED").length,
+          },
+        ]}
+        footer={<p className="px-2 text-xs text-slate-500">{session.user.name}</p>}
       />
       <main className="flex-1 px-8 py-8">
         <PageHeader title="Department Queue" subtitle="Prioritized support records assigned to your team." />

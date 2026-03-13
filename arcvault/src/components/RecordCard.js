@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 const borderByPriority = {
   HIGH: "border-l-red-500",
   MEDIUM: "border-l-amber-500",
-  LOW: "border-l-green-500",
+  LOW: "border-l-emerald-500",
 };
 
 export default function RecordCard({ record, onResolved }) {
@@ -25,7 +25,9 @@ export default function RecordCard({ record, onResolved }) {
   }
 
   return (
-    <article className={`rounded-xl border-l-4 ${borderByPriority[record.priority]} bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`}>
+    <article
+      className={`rounded-3xl border border-slate-200 border-l-4 ${borderByPriority[record.priority]} bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`}
+    >
       <button className="w-full text-left" onClick={() => setExpanded((v) => !v)}>
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -34,17 +36,23 @@ export default function RecordCard({ record, onResolved }) {
           </div>
           <RelativeTime value={record.processedAt} />
         </div>
-        <h3 className="mt-3 font-semibold text-slate-900">{record.coreIssue}</h3>
+        <h3 className="mt-3 text-lg font-semibold text-slate-900">{record.coreIssue}</h3>
         <p className="mt-1 text-sm text-slate-600">{record.urgencySignal}</p>
       </button>
 
       {expanded && (
         <div className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm text-slate-600">
-          <p><span className="font-medium text-slate-800">Routing Reason:</span> {record.routingReason ?? "N/A"}</p>
-          <p><span className="font-medium text-slate-800">Summary:</span> {record.summary}</p>
-          <p><span className="font-medium text-slate-800">Message:</span> {record.request.rawMessage}</p>
+          <p>
+            <span className="font-medium text-slate-800">Routing Reason:</span> {record.routingReason ?? "N/A"}
+          </p>
+          <p>
+            <span className="font-medium text-slate-800">Summary:</span> {record.summary}
+          </p>
+          <p>
+            <span className="font-medium text-slate-800">Message:</span> {record.request.rawMessage}
+          </p>
           {record.status !== "RESOLVED" && (
-            <Button onClick={resolve} disabled={pending} className="mt-2">
+            <Button onClick={resolve} disabled={pending} className="mt-2 rounded-xl">
               {pending ? "Resolving..." : "Mark as Resolved"}
             </Button>
           )}

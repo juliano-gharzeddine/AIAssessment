@@ -20,7 +20,10 @@ export default function AboutPage() {
             </div>
             <span className="text-xl font-bold tracking-tight text-slate-900">ARCVAULT</span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <Link href="/submit" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+              Submit a Ticket
+            </Link>
             <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-blue-600">Sign In</Link>
             <Link href="#contact" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition-colors">
               Contact Us
@@ -40,6 +43,15 @@ export default function AboutPage() {
               ArcVault was founded in 2021 with a simple mission: to bridge the gap between 
               complex enterprise software and the people who keep it running. 
             </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/submit" className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700">
+                Submit a Ticket
+                <ArrowRight size={16} />
+              </Link>
+              <Link href="/login" className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+                Sign In
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -93,6 +105,13 @@ export default function AboutPage() {
                   <MessageCircle size={20} />
                   Open Live Chat
                 </button>
+                <Link 
+                  href="/submit" 
+                  className="flex items-center justify-center gap-3 rounded-xl bg-blue-500 border border-blue-300 px-8 py-4 text-lg font-bold text-white transition hover:bg-blue-400"
+                >
+                  Submit a Ticket
+                  <ArrowRight size={18} />
+                </Link>
               </div>
             </div>
             
