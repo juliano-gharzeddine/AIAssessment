@@ -11,10 +11,15 @@ export default async function RegulatorPage({ searchParams }) {
 
   const params = await searchParams;
   const view = params?.view === "all" ? "all" : "pending";
-  const where = view === "pending" ? { status: "PENDING_REVIEW" } : {};
+  const pendingWhere = {
+    status: "PENDING_REVIEW",
+    OR: [{ confidence: { lt: 0.7 } }, { escalationFlag: true }],
+  };
+
+  const where = view === "pending" ? pendingWhere : {};
 
   const [pendingCount, records, departments] = await Promise.all([
-    db.processedRecord.count({ where: { status: "PENDING_REVIEW" } }),
+    db.processedRecord.count({ where: pendingWhere }),
     db.processedRecord.findMany({
       where,
       include: { request: true, department: true },
@@ -44,11 +49,8 @@ export default async function RegulatorPage({ searchParams }) {
         footer={<p className="px-2 text-xs text-slate-500">{session.user.email}</p>}
       />
       <main className="flex-1 px-8 py-8">
-        <PageHeader
-          title={view === "all" ? "All Records" : "Pending Review"}
-          subtitle="Review AI-enriched records, filter by metadata, and route cases to the right department."
-        />
-        <RegulatorClient initialRecords={records} departments={departments} reviewerId={session.user.id} />
+        <PageHeader title={view === "all" ? "All Records" : "Pending Review"} subtitle="Review AI-enriched records and route uncertain or flagged records." />
+        <RegulatorClient initialRecords={records} departments={departments} />
       </main>
     </div>
   );

@@ -48,6 +48,20 @@ async function main() {
 
   console.log("✅ Regulator created");
 
+  await prisma.user.upsert({
+    where: { email: "customer@arcvault.io" },
+    update: {},
+    create: {
+      email: "customer@arcvault.io",
+      passwordHash: await bcrypt.hash("customer123", 10),
+      name: "John Smith",
+      role: "CUSTOMER",
+      departmentId: null,
+    },
+  });
+
+  console.log("✅ Customer created");
+
   const departmentUsers = [
     { email: "engineering@arcvault.io", name: "Engineering Team", slug: "engineering" },
     { email: "billing@arcvault.io", name: "Billing Team", slug: "billing" },

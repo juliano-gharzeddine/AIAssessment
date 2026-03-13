@@ -1,8 +1,14 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import db from "@/lib/db";
 
 export async function submitRequestAction(_, formData) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: "Please sign in to submit a request." };
+  }
+
   const source = formData.get("source");
   const message = (formData.get("message") || "").trim();
 
@@ -13,6 +19,7 @@ export async function submitRequestAction(_, formData) {
     data: {
       source,
       rawMessage: message,
+      userId: session.user.id,
     },
   });
 

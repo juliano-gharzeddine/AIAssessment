@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { SOURCE_LABELS } from "@/lib/labels";
 
 const initialState = {};
 
-export default function SubmitForm() {
+export default function SubmitForm({ user }) {
   const [state, action, pending] = useActionState(submitRequestAction, initialState);
   const [message, setMessage] = useState("");
   const length = message.length;
@@ -30,12 +31,23 @@ export default function SubmitForm() {
   return (
     <Card className="mx-auto max-w-3xl rounded-3xl border border-slate-200 p-8">
       <form action={action} className="space-y-5">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Name</label>
+            <input value={user.name ?? ""} readOnly className="w-full rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-700" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Email</label>
+            <input value={user.email ?? ""} readOnly className="w-full rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-700" />
+          </div>
+        </div>
+
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">Source</label>
           <Select name="source" defaultValue="WEB_FORM" required className="rounded-xl bg-slate-50">
-            <option value="EMAIL">Email</option>
-            <option value="WEB_FORM">Web Form</option>
-            <option value="SUPPORT_PORTAL">Support Portal</option>
+            {Object.entries(SOURCE_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
           </Select>
         </div>
 
