@@ -28,11 +28,13 @@ model User {
   updatedAt    DateTime    @updatedAt
 
   reviewedRecords ProcessedRecord[] @relation("ReviewedBy")
+  requests        Request[]
 }
 
 enum Role {
   REGULATOR
   DEPARTMENT
+  CUSTOMER
 }
 
 model Request {
@@ -40,6 +42,8 @@ model Request {
   source      RequestSource
   rawMessage  String
   submittedAt DateTime      @default(now())
+  userId      String?
+  user        User?         @relation(fields: [userId], references: [id])
 
   processedRecord ProcessedRecord?
 }

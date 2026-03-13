@@ -10,7 +10,10 @@ export default async function DashboardPage() {
   if (!session || session.user.role !== "DEPARTMENT") redirect("/login");
 
   const records = await db.processedRecord.findMany({
-    where: { departmentId: session.user.departmentId },
+    where: {
+      departmentId: session.user.departmentId,
+      status: { in: ["AUTO_ROUTED", "MANUALLY_ROUTED", "RESOLVED"] },
+    },
     include: { request: true },
     orderBy: { processedAt: "desc" },
   });
