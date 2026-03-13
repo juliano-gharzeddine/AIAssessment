@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('REGULATOR', 'DEPARTMENT');
+CREATE TYPE "Role" AS ENUM ('REGULATOR', 'DEPARTMENT', 'CUSTOMER');
 
 -- CreateEnum
 CREATE TYPE "RequestSource" AS ENUM ('EMAIL', 'WEB_FORM', 'SUPPORT_PORTAL');
@@ -43,6 +43,7 @@ CREATE TABLE "Request" (
     "source" "RequestSource" NOT NULL,
     "rawMessage" TEXT NOT NULL,
     "submittedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userId" TEXT,
     "processed" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Request_pkey" PRIMARY KEY ("id")
@@ -98,6 +99,9 @@ CREATE UNIQUE INDEX "ProcessedRecord_requestId_key" ON "ProcessedRecord"("reques
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Request" ADD CONSTRAINT "Request_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PipelineError" ADD CONSTRAINT "PipelineError_requestId_fkey" FOREIGN KEY ("requestId") REFERENCES "Request"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

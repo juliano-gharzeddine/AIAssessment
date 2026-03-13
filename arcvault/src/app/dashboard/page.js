@@ -18,6 +18,9 @@ export default async function DashboardPage() {
     orderBy: { processedAt: "desc" },
   });
 
+  // Compute active state for the sidebar item on the server
+  const isDashboardActive = (pathname) => pathname === "/dashboard";
+
   return (
     <div className="flex min-h-screen bg-slate-100">
       <Sidebar
@@ -28,7 +31,8 @@ export default async function DashboardPage() {
             href: "/dashboard",
             label: "My Queue",
             count: records.filter((r) => r.status !== "RESOLVED").length,
-            isActive: ({ pathname }) => pathname === "/dashboard",
+            // Instead of passing a function, pass a boolean.
+            isActive: true,
           },
         ]}
         footer={<p className="px-2 text-xs text-slate-500">{session.user.name}</p>}
