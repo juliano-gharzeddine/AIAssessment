@@ -6,23 +6,44 @@ import RecordCard from "@/components/RecordCard";
 export default function DashboardClient({ initialRecords }) {
   const [records, setRecords] = useState(initialRecords);
 
-  const stats = useMemo(() => ({
-    total: records.length,
-    pending: records.filter((record) => record.status !== "RESOLVED").length,
-    resolved: records.filter((record) => record.status === "RESOLVED").length,
-  }), [records]);
+  const stats = useMemo(
+    () => ({
+      total: records.length,
+      pending: records.filter((record) => record.status !== "RESOLVED").length,
+      resolved: records.filter((record) => record.status === "RESOLVED").length,
+    }),
+    [records],
+  );
+
+  const statCards = [
+    { label: "Total assigned", value: stats.total, tone: "from-indigo-500 to-blue-500" },
+    { label: "Pending", value: stats.pending, tone: "from-amber-500 to-orange-500" },
+    { label: "Resolved", value: stats.resolved, tone: "from-emerald-500 to-green-500" },
+  ];
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-xl bg-white p-4 shadow-sm"><p className="text-xs text-slate-500">Total assigned</p><p className="text-2xl font-bold text-slate-900">{stats.total}</p></div>
-        <div className="rounded-xl bg-white p-4 shadow-sm"><p className="text-xs text-slate-500">Pending</p><p className="text-2xl font-bold text-slate-900">{stats.pending}</p></div>
-        <div className="rounded-xl bg-white p-4 shadow-sm"><p className="text-xs text-slate-500">Resolved</p><p className="text-2xl font-bold text-slate-900">{stats.resolved}</p></div>
+        {statCards.map((card) => (
+          <div key={card.label} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-wide text-slate-500">{card.label}</p>
+              <span className={`h-2.5 w-2.5 rounded-full bg-gradient-to-r ${card.tone}`} />
+            </div>
+            <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{card.value}</p>
+          </div>
+        ))}
       </div>
 
       <div className="grid gap-4">
         {records.map((record) => (
-          <RecordCard key={record.id} record={record} onResolved={(id) => setRecords((prev) => prev.map((item) => (item.id === id ? { ...item, status: "RESOLVED" } : item)))} />
+          <RecordCard
+            key={record.id}
+            record={record}
+            onResolved={(id) =>
+              setRecords((prev) => prev.map((item) => (item.id === id ? { ...item, status: "RESOLVED" } : item)))
+            }
+          />
         ))}
       </div>
     </div>
