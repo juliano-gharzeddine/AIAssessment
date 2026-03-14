@@ -10,6 +10,12 @@ export default async function SubmitPage() {
     redirect("/login?callbackUrl=/submit");
   }
 
+  if (session.user.role !== "CUSTOMER") {
+    if (session.user.role === "REGULATOR") redirect("/regulator");
+    if (session.user.role === "DEPARTMENT") redirect("/department");
+    redirect("/");
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 px-6 py-10">
       <div className="mx-auto max-w-6xl">

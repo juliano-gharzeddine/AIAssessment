@@ -3,8 +3,14 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LogoutIcon, MenuIcon } from "@/components/icons";
+import { LogOut, Menu, Repeat, ShieldCheck, Building2, ClipboardList } from "lucide-react";
 import { useMemo, useState } from "react";
+
+const ICONS = {
+  regulator: ShieldCheck,
+  department: Building2,
+  queue: ClipboardList,
+};
 
 export default function Sidebar({ title, subtitle, items = [], footer }) {
   const pathname = usePathname();
@@ -32,7 +38,7 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
         onClick={() => setCollapsed((v) => !v)}
         className="mb-5 self-start rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
       >
-        <MenuIcon className="h-4 w-4" />
+        <Menu className="h-4 w-4" />
       </button>
 
       <div className="mb-8 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-4 text-white shadow-lg shadow-blue-200/60">
@@ -43,17 +49,23 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
       <nav className="space-y-2">
         {items.map((item) => {
           const active = isItemActive(item);
+          const ItemIcon = ICONS[item.icon] ?? ClipboardList;
+
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center justify-between rounded-2xl border px-3 py-2.5 text-sm font-medium transition ${
+              title={item.label}
+              className={`flex items-center ${collapsed ? "justify-center" : "justify-between"} rounded-2xl border px-3 py-2.5 text-sm font-medium transition ${
                 active
                   ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm"
                   : "border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50"
               }`}
             >
-              <span>{collapsed ? item.shortLabel ?? item.label[0] : item.label}</span>
+              <span className="flex items-center gap-2">
+                <ItemIcon className="h-4 w-4 shrink-0" />
+                {!collapsed && <span>{item.label}</span>}
+              </span>
               {!collapsed && item.count != null && (
                 <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-600"}`}>
                   {item.count}
@@ -66,11 +78,19 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
 
       <div className="mt-auto space-y-3 border-t border-slate-200 pt-4">
         {!collapsed && footer}
+
+        <button
+          onClick={() => signOut({ callbackUrl: "/login?switch=1" })}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 hover:border-slate-300 hover:bg-slate-100"
+        >
+          <Repeat className="h-4 w-4" /> {!collapsed && "Switch Account"}
+        </button>
+
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 hover:border-slate-300 hover:bg-slate-100"
         >
-          <LogoutIcon className="h-4 w-4" /> {!collapsed && "Logout"}
+          <LogOut className="h-4 w-4" /> {!collapsed && "Logout"}
         </button>
       </div>
     </aside>

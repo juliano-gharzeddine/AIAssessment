@@ -41,7 +41,7 @@ export default function LoginPage() {
     if (session?.user?.role === "REGULATOR") {
       router.push("/regulator");
     } else if (session?.user?.role === "DEPARTMENT") {
-      router.push("/dashboard");
+      router.push("/department");
     } else {
       router.push("/");
     }

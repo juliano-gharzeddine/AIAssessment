@@ -12,12 +12,12 @@ function getSidebarItems(pendingCount, view) {
       href: "/regulator",
       label: "Pending Review",
       count: pendingCount,
-      active: view !== "all",
+      icon: "regulator",
     },
     {
       href: "/regulator?view=all",
       label: "All Records",
-      active: view === "all",
+      icon: "queue",
     },
   ];
 }

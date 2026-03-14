@@ -9,5 +9,6 @@ export async function markResolvedAction(recordId) {
     data: { status: "RESOLVED" },
   });
 
+  revalidatePath("/department");
   revalidatePath("/dashboard");
 }

@@ -9,6 +9,10 @@ export async function submitRequestAction(_, formData) {
     return { error: "Please sign in to submit a request." };
   }
 
+  if (session.user.role !== "CUSTOMER") {
+    return { error: "Only customer accounts can submit tickets." };
+  }
+
   const source = formData.get("source");
   const message = (formData.get("message") || "").trim();
 
