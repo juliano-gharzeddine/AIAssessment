@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import PageHeader from "@/components/PageHeader";
 import SubmitForm from "@/components/SubmitForm";
+import CustomerHeader from "@/components/CustomerHeader";
 
 export default async function SubmitPage() {
   const session = await auth();
@@ -19,6 +20,7 @@ export default async function SubmitPage() {
   return (
     <main className="min-h-screen bg-slate-100 px-6 py-10">
       <div className="mx-auto max-w-6xl">
+        <CustomerHeader name={session.user.name} />
         <PageHeader title="Submit a support request" subtitle="Tell us what happened. We'll triage and route it right away." />
         <SubmitForm user={session.user} />
       </div>

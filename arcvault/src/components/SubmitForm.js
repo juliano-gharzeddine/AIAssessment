@@ -13,6 +13,7 @@ const initialState = {};
 export default function SubmitForm({ user }) {
   const [state, action, pending] = useActionState(submitRequestAction, initialState);
   const [message, setMessage] = useState("");
+  const maxLength = 1500;
   const length = message.length;
   const lengthColor = useMemo(() => (length < 50 ? "text-red-500" : "text-emerald-600"), [length]);
 
@@ -59,10 +60,12 @@ export default function SubmitForm({ user }) {
             minLength={50}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            maxLength={maxLength}
             className="min-h-44 rounded-2xl bg-slate-50"
           />
           <div className="mt-1 flex items-center justify-between">
             <p className={`text-xs ${lengthColor}`}>{length}/50 minimum characters</p>
+            <p className="text-xs text-slate-500">{length}/{maxLength} max characters</p>
             {state?.error && <p className="text-xs text-red-500">{state.error}</p>}
           </div>
         </div>

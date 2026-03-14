@@ -21,3 +21,20 @@ export function relativeTime(dateString) {
   const days = Math.floor(hours / 24);
   return `${days} day${days === 1 ? "" : "s"} ago`;
 }
+
+export function decodeHtmlEntities(text = "") {
+  return text
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&#x2F;", "/")
+    .replaceAll("\\n", "\n");
+}
+
+export function hasDisplayableIdentifiers(identifiers) {
+  if (!identifiers || typeof identifiers !== "object" || Array.isArray(identifiers)) return false;
+  return Object.keys(identifiers).length > 0;
+}

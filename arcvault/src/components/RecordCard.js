@@ -6,6 +6,7 @@ import CategoryBadge from "@/components/CategoryBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import RelativeTime from "@/components/RelativeTime";
 import { Button } from "@/components/ui/button";
+import { decodeHtmlEntities, hasDisplayableIdentifiers } from "@/lib/utils";
 
 const borderByPriority = {
   HIGH: "border-l-red-200",
@@ -54,7 +55,15 @@ export default function RecordCard({ record, onResolved }) {
         <div ref={detailsRef} className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm text-slate-600">
           <p><span className="font-medium text-slate-800">Routing Reason:</span> {record.routingReason ?? "N/A"}</p>
           <p><span className="font-medium text-slate-800">Summary:</span> {record.summary}</p>
-          <p><span className="font-medium text-slate-800">Message:</span> {record.request.rawMessage}</p>
+          <p><span className="font-medium text-slate-800">Message:</span> <span className="whitespace-pre-wrap break-words">{decodeHtmlEntities(record.request.rawMessage)}</span></p>
+          {hasDisplayableIdentifiers(record.identifiers) && (
+            <div>
+              <p><span className="font-medium text-slate-800">Identifiers:</span></p>
+              <pre className="mt-1 overflow-x-auto rounded-lg bg-slate-100 p-2 text-xs text-slate-700">
+                {JSON.stringify(record.identifiers, null, 2)}
+              </pre>
+            </div>
+          )}
           {record.status !== "RESOLVED" && (
             <Button onClick={resolve} disabled={pending} className="mt-2 rounded-xl">{pending ? "Resolving..." : "Mark as Resolved"}</Button>
           )}
