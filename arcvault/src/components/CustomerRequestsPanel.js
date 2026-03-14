@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown } from "lucide-react";
 import { CATEGORY_LABELS, SOURCE_LABELS, STATUS_LABELS } from "@/lib/labels";
-import { decodeHtmlEntities } from "@/lib/utils";
+import { decodeHtmlEntities, smartDateTime } from "@/lib/utils";
 
 function getCustomerStatus(record) {
   if (!record) return "PENDING";
@@ -13,6 +14,59 @@ function getCustomerStatus(record) {
 function StatusBadge({ status }) {
   const tone = status === "RESOLVED" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700";
   return <span className={`rounded-full px-2 py-1 text-xs font-semibold ${tone}`}>{STATUS_LABELS[status] ?? status}</span>;
+}
+
+function CustomerStatusDropdown({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const options = {
+    ALL: "All statuses",
+    PENDING: "Pending",
+    RESOLVED: "Resolved",
+  };
+
+  useEffect(() => {
+    function handleOutsideClick(event) {
+      if (!ref.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="flex min-w-36 items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+      >
+        <span>{options[value]}</span>
+        <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 z-10 mt-2 w-full rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+          {Object.entries(options).map(([optionValue, optionLabel]) => (
+            <button
+              key={optionValue}
+              type="button"
+              onClick={() => {
+                onChange(optionValue);
+                setOpen(false);
+              }}
+              className="mt-1 flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+            >
+              <span>{optionLabel}</span>
+              {value === optionValue && <Check className="h-3.5 w-3.5" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function CustomerRequestsPanel({ initialRequests }) {
@@ -43,15 +97,7 @@ export default function CustomerRequestsPanel({ initialRequests }) {
               onChange={(event) => setKeyword(event.target.value)}
               className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring-2"
             />
-            <select
-              value={status}
-              onChange={(event) => setStatus(event.target.value)}
-              className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring-2"
-            >
-              <option value="ALL">All statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="RESOLVED">Resolved</option>
-            </select>
+            <CustomerStatusDropdown value={status} onChange={setStatus} />
           </div>
         </div>
       </div>
@@ -65,9 +111,9 @@ export default function CustomerRequestsPanel({ initialRequests }) {
                 <StatusBadge status={customerStatus} />
               </div>
               <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-800">{decodeHtmlEntities(request.rawMessage).slice(0, 140)}{decodeHtmlEntities(request.rawMessage).length > 140 ? "..." : ""}</p>
-              <p className="mt-2 text-xs text-slate-500">Submitted {new Date(request.submittedAt).toLocaleString()}</p>
+              <p className="mt-2 text-xs text-slate-500">Submitted {smartDateTime(request.submittedAt)}</p>
               {request.processedRecord?.status === "RESOLVED" && request.processedRecord.updatedAt && (
-                <p className="mt-1 text-xs text-emerald-700">Resolved {new Date(request.processedRecord.updatedAt).toLocaleString()}</p>
+                <p className="mt-1 text-xs text-emerald-700">Resolved {smartDateTime(request.processedRecord.updatedAt)}</p>
               )}
               <p className="mt-1 text-xs text-slate-600">
                 {request.processedRecord

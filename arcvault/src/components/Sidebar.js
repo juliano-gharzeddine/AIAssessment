@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LogOut, Menu, Repeat, ShieldCheck, Building2, ClipboardList } from "lucide-react";
+import { LogOut, Menu, Repeat, ShieldCheck, Building2, ClipboardList, Vault } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const ICONS = {
@@ -42,7 +42,9 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
       </button>
 
       <div className="mb-8 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-4 text-white shadow-lg shadow-blue-200/60">
-        <h2 className="font-semibold tracking-tight">{collapsed ? "AV" : title}</h2>
+        <h2 className="font-semibold tracking-tight">
+          {collapsed ? <Vault className="h-5 w-5" /> : title}
+        </h2>
         {!collapsed && <p className="mt-1 text-xs text-blue-100">{subtitle}</p>}
       </div>
 
