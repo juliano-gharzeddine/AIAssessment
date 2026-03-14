@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence } from "framer-motion";
 import RecordCard from "@/components/RecordCard";
 
 export default function DashboardClient({ initialRecords }) {
@@ -42,11 +41,9 @@ export default function DashboardClient({ initialRecords }) {
       </div>
 
       <div className="grid gap-4">
-        <AnimatePresence initial={false}>
-          {sortedRecords.map((record) => (
-            <RecordCard key={record.id} record={record} onResolved={(id) => setRecords((prev) => prev.filter((item) => item.id !== id))} />
-          ))}
-        </AnimatePresence>
+        {sortedRecords.map((record) => (
+          <RecordCard key={record.id} record={record} onResolved={(id) => setRecords((prev) => prev.filter((item) => item.id !== id))} />
+        ))}
       </div>
     </div>
   );

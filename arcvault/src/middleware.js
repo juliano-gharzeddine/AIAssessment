@@ -7,7 +7,7 @@ const PUBLIC_PATHS = ["/", "/login"];
 
 function getDefaultRouteForRole(role) {
   if (role === "REGULATOR") return "/regulator";
-  if (role === "DEPARTMENT") return "/dashboard";
+  if (role === "DEPARTMENT") return "/department";
   return "/";
 }
 
@@ -19,7 +19,7 @@ export async function middleware(req) {
   const role = token?.role;
   const isPublic = PUBLIC_PATHS.includes(pathname);
 
-  if (!isLoggedIn && (pathname.startsWith("/regulator") || pathname.startsWith("/dashboard") || pathname.startsWith("/submit"))) {
+  if (!isLoggedIn && (pathname.startsWith("/regulator") || pathname.startsWith("/department") || pathname.startsWith("/dashboard") || pathname.startsWith("/submit"))) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("callbackUrl", `${pathname}${req.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
@@ -37,7 +37,11 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL(getDefaultRouteForRole(role), req.url));
   }
 
-  if (isLoggedIn && pathname.startsWith("/dashboard") && role !== "DEPARTMENT") {
+  if (isLoggedIn && (pathname.startsWith("/dashboard") || pathname.startsWith("/department")) && role !== "DEPARTMENT") {
+    return NextResponse.redirect(new URL(getDefaultRouteForRole(role), req.url));
+  }
+
+  if (isLoggedIn && pathname.startsWith("/submit") && role !== "CUSTOMER") {
     return NextResponse.redirect(new URL(getDefaultRouteForRole(role), req.url));
   }
 

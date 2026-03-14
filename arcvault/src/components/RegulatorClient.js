@@ -1,9 +1,8 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowUpDown } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { ArrowDown, ArrowUp, Check, ChevronDown } from "lucide-react";
 import { routeRecordAction } from "@/app/regulator/actions";
 import CategoryBadge from "@/components/CategoryBadge";
 import ConfidenceScore from "@/components/ConfidenceScore";
@@ -19,20 +18,82 @@ const FILTERS = {
   source: SOURCE_LABELS,
 };
 
-function FilterSelect({ name, label, options, value, onChange }) {
+const STATUS_TONES = {
+  PENDING: "bg-amber-50 text-amber-700 border-amber-200",
+  AUTO_ROUTED: "bg-sky-50 text-sky-700 border-sky-200",
+  PENDING_REVIEW: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  MANUALLY_ROUTED: "bg-violet-50 text-violet-700 border-violet-200",
+  RESOLVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
+};
+
+function FilterDropdown({ name, placeholder, options, value, onChange, toneMap }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleOutsideClick(event) {
+      if (!ref.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const selectedLabel = value ? options[value] : placeholder;
+  const selectedTone = toneMap?.[value] ?? "border-slate-200 bg-white text-slate-700";
+
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(name, e.target.value)}
-      className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700"
-    >
-      <option value="">{label}</option>
-      {Object.entries(options).map(([optionValue, optionLabel]) => (
-        <option key={optionValue} value={optionValue}>{optionLabel}</option>
-      ))}
-      {value ? <option value="">Clear</option> : null}
-    </select>
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex min-w-36 items-center justify-between gap-2 rounded-xl border px-3 py-1.5 text-xs font-medium ${value ? selectedTone : "border-slate-200 bg-white text-slate-700"}`}
+      >
+        <span>{selectedLabel}</span>
+        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute z-10 mt-2 w-full rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+          <button
+            type="button"
+            onClick={() => {
+              onChange(name, "");
+              setOpen(false);
+            }}
+            className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs text-slate-600 hover:bg-slate-50"
+          >
+            <span>{placeholder}</span>
+            {!value && <Check className="h-3.5 w-3.5" />}
+          </button>
+          {Object.entries(options).map(([optionValue, optionLabel]) => (
+            <button
+              type="button"
+              key={optionValue}
+              onClick={() => {
+                onChange(name, optionValue);
+                setOpen(false);
+              }}
+              className={`mt-1 flex w-full items-center justify-between rounded-lg border px-2 py-1.5 text-left text-xs ${toneMap?.[optionValue] ?? "border-transparent text-slate-700 hover:bg-slate-50"}`}
+            >
+              <span>{optionLabel}</span>
+              {value === optionValue && <Check className="h-3.5 w-3.5" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
+}
+
+function SortIndicator({ active, direction }) {
+  if (!active) {
+    return <ArrowDown className="h-3.5 w-3.5 opacity-40" />;
+  }
+
+  return direction === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />;
 }
 
 export default function RegulatorClient({ initialRecords, departments }) {
@@ -45,6 +106,7 @@ export default function RegulatorClient({ initialRecords, departments }) {
   const [sortBy, setSortBy] = useState("submittedAt");
   const [sortDirection, setSortDirection] = useState("desc");
   const [isPending, startTransition] = useTransition();
+  const rowRef = useRef(null);
 
   const filters = {
     category: searchParams.get("category") ?? "",
@@ -73,6 +135,20 @@ export default function RegulatorClient({ initialRecords, departments }) {
       return sortDirection === "asc" ? result : -result;
     });
   }, [records, filters, sortBy, sortDirection]);
+
+  useEffect(() => {
+    if (!rowRef.current) return;
+    const nodes = rowRef.current.querySelectorAll("tbody tr");
+    nodes.forEach((node, index) => {
+      node.animate(
+        [
+          { opacity: 0, transform: "translateY(10px)" },
+          { opacity: 1, transform: "translateY(0)" },
+        ],
+        { duration: 320, delay: index * 35, easing: "ease-out", fill: "both" },
+      );
+    });
+  }, [rows.length]);
 
   function setFilter(name, value) {
     const params = new URLSearchParams(searchParams.toString());
@@ -106,34 +182,51 @@ export default function RegulatorClient({ initialRecords, departments }) {
   return (
     <>
       <div className="mb-4 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-        <FilterSelect name="category" label={filters.category ? CATEGORY_LABELS[filters.category] : "Category"} options={FILTERS.category} value={filters.category} onChange={setFilter} />
-        <FilterSelect name="priority" label={filters.priority ? PRIORITY_LABELS[filters.priority] : "Priority"} options={FILTERS.priority} value={filters.priority} onChange={setFilter} />
-        <FilterSelect name="status" label={filters.status ? STATUS_LABELS[filters.status] : "Status"} options={FILTERS.status} value={filters.status} onChange={setFilter} />
-        <FilterSelect name="source" label={filters.source ? SOURCE_LABELS[filters.source] : "Source"} options={FILTERS.source} value={filters.source} onChange={setFilter} />
+        <FilterDropdown name="category" placeholder="Category" options={FILTERS.category} value={filters.category} onChange={setFilter} />
+        <FilterDropdown name="priority" placeholder="Priority" options={FILTERS.priority} value={filters.priority} onChange={setFilter} />
+        <FilterDropdown name="status" placeholder="Status" options={FILTERS.status} value={filters.status} onChange={setFilter} toneMap={STATUS_TONES} />
+        <FilterDropdown name="source" placeholder="Source" options={FILTERS.source} value={filters.source} onChange={setFilter} />
       </div>
 
-      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm" ref={rowRef}>
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase text-slate-500">
             <tr>
-              <th className="px-4 py-3">Category</th><th className="px-4 py-3"><button onClick={() => toggleSort("priority")} className="flex items-center gap-1 hover:text-blue-600">Priority <ArrowUpDown className="h-3.5 w-3.5" /></button></th><th className="px-4 py-3"><button onClick={() => toggleSort("confidence")} className="flex items-center gap-1 hover:text-blue-600">Confidence <ArrowUpDown className="h-3.5 w-3.5" /></button></th><th className="px-4 py-3">Source</th><th className="px-4 py-3">Issue</th><th className="px-4 py-3">Escalation</th><th className="px-4 py-3"><button onClick={() => toggleSort("submittedAt")} className="flex items-center gap-1 hover:text-blue-600">Submitted <ArrowUpDown className="h-3.5 w-3.5" /></button></th><th className="px-4 py-3">Action</th>
+              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">
+                <button onClick={() => toggleSort("priority")} className="flex items-center gap-1 hover:text-blue-600">
+                  Priority <SortIndicator active={sortBy === "priority"} direction={sortDirection} />
+                </button>
+              </th>
+              <th className="px-4 py-3">
+                <button onClick={() => toggleSort("confidence")} className="flex items-center gap-1 hover:text-blue-600">
+                  Confidence <SortIndicator active={sortBy === "confidence"} direction={sortDirection} />
+                </button>
+              </th>
+              <th className="px-4 py-3">Source</th>
+              <th className="px-4 py-3">Issue</th>
+              <th className="px-4 py-3">Escalation</th>
+              <th className="px-4 py-3">
+                <button onClick={() => toggleSort("submittedAt")} className="flex items-center gap-1 hover:text-blue-600">
+                  Submitted <SortIndicator active={sortBy === "submittedAt"} direction={sortDirection} />
+                </button>
+              </th>
+              <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
           <tbody>
-            <AnimatePresence initial={false}>
-              {rows.map((record) => (
-                <motion.tr key={record.id} initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="border-t border-slate-100 hover:bg-blue-50/40">
-                  <td className="px-4 py-3"><CategoryBadge category={record.category} /></td>
-                  <td className="px-4 py-3"><PriorityBadge priority={record.priority} /></td>
-                  <td className="px-4 py-3"><ConfidenceScore score={record.confidence * 100} /></td>
-                  <td className="px-4 py-3 text-slate-600">{SOURCE_LABELS[record.request.source] ?? record.request.source}</td>
-                  <td className="px-4 py-3 text-slate-700">{record.coreIssue}</td>
-                  <td className="px-4 py-3 text-slate-700">{record.escalationReason ?? "-"}</td>
-                  <td className="px-4 py-3"><RelativeTime value={record.request.submittedAt} /></td>
-                  <td className="px-4 py-3"><button onClick={() => setActiveRecord(record)} className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-medium hover:bg-slate-50">Route</button></td>
-                </motion.tr>
-              ))}
-            </AnimatePresence>
+            {rows.map((record) => (
+              <tr key={record.id} className="border-t border-slate-100 transition-colors hover:bg-blue-50/40">
+                <td className="px-4 py-3"><CategoryBadge category={record.category} /></td>
+                <td className="px-4 py-3"><PriorityBadge priority={record.priority} /></td>
+                <td className="px-4 py-3"><ConfidenceScore score={record.confidence * 100} /></td>
+                <td className="px-4 py-3 text-slate-600">{SOURCE_LABELS[record.request.source] ?? record.request.source}</td>
+                <td className="px-4 py-3 text-slate-700">{record.coreIssue}</td>
+                <td className="px-4 py-3 text-slate-700">{record.escalationReason ?? "-"}</td>
+                <td className="px-4 py-3"><RelativeTime value={record.request.submittedAt} /></td>
+                <td className="px-4 py-3"><button onClick={() => setActiveRecord(record)} className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-medium hover:bg-slate-50">Route</button></td>
+              </tr>
+            ))}
           </tbody>
         </table>
         {!rows.length && <p className="p-8 text-center text-slate-500">No records available for selected filters.</p>}
