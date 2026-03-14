@@ -108,6 +108,10 @@ export default function RegulatorClient({ initialRecords, departments }) {
   const [isPending, startTransition] = useTransition();
   const rowRef = useRef(null);
 
+  useEffect(() => {
+    setRecords(initialRecords);
+  }, [initialRecords]);
+
   const filters = {
     category: searchParams.get("category") ?? "",
     priority: searchParams.get("priority") ?? "",
@@ -216,7 +220,7 @@ export default function RegulatorClient({ initialRecords, departments }) {
           </thead>
           <tbody>
             {rows.map((record) => (
-              <tr key={record.id} className="border-t border-slate-100 transition-colors hover:bg-blue-50/40">
+              <tr key={record.id} onClick={() => setActiveRecord(record)} className="cursor-pointer border-t border-slate-100 transition-colors hover:bg-blue-50/40">
                 <td className="px-4 py-3"><CategoryBadge category={record.category} /></td>
                 <td className="px-4 py-3"><PriorityBadge priority={record.priority} /></td>
                 <td className="px-4 py-3"><ConfidenceScore score={record.confidence * 100} /></td>
@@ -224,7 +228,21 @@ export default function RegulatorClient({ initialRecords, departments }) {
                 <td className="px-4 py-3 text-slate-700">{record.coreIssue}</td>
                 <td className="px-4 py-3 text-slate-700">{record.escalationReason ?? "-"}</td>
                 <td className="px-4 py-3"><RelativeTime value={record.request.submittedAt} /></td>
-                <td className="px-4 py-3"><button onClick={() => setActiveRecord(record)} className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-medium hover:bg-slate-50">Route</button></td>
+                <td className="px-4 py-3">
+                  {record.confidence < 0.7 ? (
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setActiveRecord(record);
+                      }}
+                      className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-medium hover:bg-slate-50"
+                    >
+                      Route
+                    </button>
+                  ) : (
+                    <span className="text-xs text-slate-400">No action</span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

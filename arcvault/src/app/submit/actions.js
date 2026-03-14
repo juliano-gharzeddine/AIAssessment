@@ -18,6 +18,7 @@ export async function submitRequestAction(_, formData) {
 
   if (!source) return { error: "Please select a source." };
   if (message.length < 50) return { error: "Message must be at least 50 characters." };
+  if (message.length > 1500) return { error: "Message cannot exceed 1500 characters." };
 
   const request = await db.request.create({
     data: {
