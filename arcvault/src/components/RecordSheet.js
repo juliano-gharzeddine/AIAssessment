@@ -14,7 +14,7 @@ export default function RecordSheet({ record, onClose, departments, onRoute }) {
 
   if (!record) return null;
 
-  const canRoute = record.confidence < 0.7;
+  const canRoute = record.confidence < 0.7 && record.status === "PENDING_REVIEW";
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/20" onClick={onClose}>
@@ -25,7 +25,7 @@ export default function RecordSheet({ record, onClose, departments, onRoute }) {
           <p><span className="font-medium text-slate-800">Source:</span> {SOURCE_LABELS[record.request.source] ?? record.request.source}</p>
           <p><span className="font-medium text-slate-800">Status:</span> {STATUS_LABELS[record.status] ?? record.status}</p>
           <p><span className="font-medium text-slate-800">Core Issue:</span> {record.coreIssue}</p>
-          <p><span className="font-medium text-slate-800">Escalation Reason:</span> {record.escalationReason ?? "None"}</p>
+          {record.escalationReason && <p><span className="font-medium text-slate-800">Escalation Reason:</span> {record.escalationReason}</p>}
           <p><span className="font-medium text-slate-800">Summary:</span> {record.summary}</p>
           <p><span className="font-medium text-slate-800">Raw Message:</span></p>
           <p className="max-h-56 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-slate-100 p-3">{decodeHtmlEntities(record.request.rawMessage)}</p>

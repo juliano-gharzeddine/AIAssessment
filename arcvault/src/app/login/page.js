@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Vault } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,8 +49,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/80">
+    <div className="min-h-screen bg-slate-100 px-4 pb-8 pt-28">
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-slate-200 bg-white/95 px-6 py-4 shadow-sm backdrop-blur-sm">
+        <div className="mx-auto flex w-full max-w-6xl items-center gap-3">
+          <div className="rounded-xl bg-blue-600 p-2 text-white">
+            <Vault className="h-5 w-5" />
+          </div>
+          <p className="text-lg font-semibold tracking-tight text-slate-900">ARCVAULT</p>
+        </div>
+      </header>
+      <div className="mx-auto w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/80">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">ArcVault</h1>
         <p className="mb-6 mt-2 text-slate-500">Sign in to your account</p>
 

@@ -42,7 +42,15 @@ export default function DashboardClient({ initialRecords }) {
 
       <div className="grid gap-4">
         {sortedRecords.map((record) => (
-          <RecordCard key={record.id} record={record} onResolved={(id) => setRecords((prev) => prev.filter((item) => item.id !== id))} />
+          <RecordCard
+            key={record.id}
+            record={record}
+            onResolved={(id) =>
+              setRecords((prev) =>
+                prev.map((item) => (item.id === id ? { ...item, status: "RESOLVED" } : item)),
+              )
+            }
+          />
         ))}
       </div>
     </div>

@@ -163,7 +163,19 @@ export default function RegulatorClient({ initialRecords, departments }) {
 
   async function onRoute(recordId, departmentId, reviewNotes) {
     const department = departments.find((item) => item.id === departmentId);
-    setRecords((prev) => prev.filter((item) => item.id !== recordId));
+    setRecords((prev) =>
+      prev.map((item) =>
+        item.id === recordId
+          ? {
+              ...item,
+              status: "MANUALLY_ROUTED",
+              departmentId,
+              reviewedAt: new Date().toISOString(),
+              reviewNotes: reviewNotes?.trim() || null,
+            }
+          : item,
+      ),
+    );
     setActiveRecord(null);
     startTransition(async () => {
       await routeRecordAction({ recordId, departmentId, reviewNotes });
@@ -226,10 +238,10 @@ export default function RegulatorClient({ initialRecords, departments }) {
                 <td className="px-4 py-3"><ConfidenceScore score={record.confidence * 100} /></td>
                 <td className="px-4 py-3 text-slate-600">{SOURCE_LABELS[record.request.source] ?? record.request.source}</td>
                 <td className="px-4 py-3 text-slate-700">{record.coreIssue}</td>
-                <td className="px-4 py-3 text-slate-700">{record.escalationReason ?? "-"}</td>
+                <td className="px-4 py-3 text-slate-700">{record.escalationReason || "-"}</td>
                 <td className="px-4 py-3"><RelativeTime value={record.request.submittedAt} /></td>
                 <td className="px-4 py-3">
-                  {record.confidence < 0.7 ? (
+                  {record.confidence < 0.7 && record.status === "PENDING_REVIEW" ? (
                     <button
                       onClick={(event) => {
                         event.stopPropagation();

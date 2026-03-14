@@ -2,27 +2,14 @@ import Link from "next/link";
 import { History, Mail, MessageCircle, ShieldCheck, ArrowRight, Vault } from "lucide-react";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
-import { SOURCE_LABELS, STATUS_LABELS, CATEGORY_LABELS } from "@/lib/labels";
-import { decodeHtmlEntities } from "@/lib/utils";
 import CustomerHeader from "@/components/CustomerHeader";
-
-
-function getCustomerStatus(record) {
-  if (!record) return "PENDING";
-  if (record.status === "RESOLVED") return "RESOLVED";
-  return "PENDING";
-}
+import CustomerRequestsPanel from "@/components/CustomerRequestsPanel";
 
 function getPortalHref(role) {
   if (role === "REGULATOR") return "/regulator";
   if (role === "DEPARTMENT") return "/department";
   if (role === "CUSTOMER") return "/";
   return "/";
-}
-
-function StatusBadge({ status }) {
-  const tone = status === "RESOLVED" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700";
-  return <span className={`rounded-full px-2 py-1 text-xs font-semibold ${tone}`}>{STATUS_LABELS[status] ?? status}</span>;
 }
 
 export default async function HomePage() {
@@ -37,7 +24,7 @@ export default async function HomePage() {
     });
 
     return (
-      <main className="min-h-screen bg-slate-100 px-6 py-10">
+      <main className="min-h-screen bg-slate-100 px-6 pb-10 pt-28">
         <div className="mx-auto max-w-5xl space-y-6">
           <CustomerHeader name={session.user.name} />
           <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -48,29 +35,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-100 px-6 py-4">
-              <h2 className="text-lg font-semibold text-slate-900">Your Requests</h2>
-            </div>
-            <div className="divide-y divide-slate-100">
-              {requests.map((request) => (
-                <div key={request.id} className="px-6 py-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm text-slate-600">{SOURCE_LABELS[request.source] ?? request.source}</p>
-                    <StatusBadge status={getCustomerStatus(request.processedRecord)} />
-                  </div>
-                  <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-800">{decodeHtmlEntities(request.rawMessage).slice(0, 140)}{decodeHtmlEntities(request.rawMessage).length > 140 ? "..." : ""}</p>
-                  <p className="mt-2 text-xs text-slate-500">Submitted {new Date(request.submittedAt).toLocaleString()}</p>
-                  <p className="mt-1 text-xs text-slate-600">
-                    {request.processedRecord
-                      ? `${CATEGORY_LABELS[request.processedRecord.category] ?? request.processedRecord.category} • ${STATUS_LABELS[getCustomerStatus(request.processedRecord)] ?? getCustomerStatus(request.processedRecord)}`
-                      : "Processing..."}
-                  </p>
-                </div>
-              ))}
-              {!requests.length && <p className="px-6 py-8 text-sm text-slate-500">You haven't submitted any requests yet.</p>}
-            </div>
-          </div>
+          <CustomerRequestsPanel initialRequests={requests} />
         </div>
       </main>
     );

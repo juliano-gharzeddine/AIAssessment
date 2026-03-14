@@ -18,7 +18,7 @@ export default async function SubmitPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-6 py-10">
+    <main className="min-h-screen bg-slate-100 px-6 pb-10 pt-28">
       <div className="mx-auto max-w-6xl">
         <CustomerHeader name={session.user.name} />
         <PageHeader title="Submit a support request" subtitle="Tell us what happened. We'll triage and route it right away." />
