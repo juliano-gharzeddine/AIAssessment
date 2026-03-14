@@ -204,30 +204,30 @@ export default function RegulatorClient({ initialRecords, departments }) {
         <FilterDropdown name="source" placeholder="Source" options={FILTERS.source} value={filters.source} onChange={setFilter} />
       </div>
 
-      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm" ref={rowRef}>
-        <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+      <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm" ref={rowRef}>
+        <table className="min-w-[1100px] w-full text-left text-sm">
+          <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
             <tr>
-              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">CATEGORY</th>
               <th className="px-4 py-3">
                 <button onClick={() => toggleSort("priority")} className="flex items-center gap-1 hover:text-blue-600">
-                  Priority <SortIndicator active={sortBy === "priority"} direction={sortDirection} />
+                  PRIORITY <SortIndicator active={sortBy === "priority"} direction={sortDirection} />
                 </button>
               </th>
               <th className="px-4 py-3">
                 <button onClick={() => toggleSort("confidence")} className="flex items-center gap-1 hover:text-blue-600">
-                  Confidence <SortIndicator active={sortBy === "confidence"} direction={sortDirection} />
+                  CONFIDENCE <SortIndicator active={sortBy === "confidence"} direction={sortDirection} />
                 </button>
               </th>
-              <th className="px-4 py-3">Source</th>
-              <th className="px-4 py-3">Issue</th>
-              <th className="px-4 py-3">Escalation</th>
+              <th className="px-4 py-3">SOURCE</th>
+              <th className="px-4 py-3">ISSUE</th>
+              <th className="px-4 py-3">ESCALATION</th>
               <th className="px-4 py-3">
                 <button onClick={() => toggleSort("submittedAt")} className="flex items-center gap-1 hover:text-blue-600">
-                  Submitted <SortIndicator active={sortBy === "submittedAt"} direction={sortDirection} />
+                  SUBMITTED <SortIndicator active={sortBy === "submittedAt"} direction={sortDirection} />
                 </button>
               </th>
-              <th className="px-4 py-3">Action</th>
+              <th className="px-4 py-3">ACTION</th>
             </tr>
           </thead>
           <tbody>
