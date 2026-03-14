@@ -42,8 +42,8 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
       </button>
 
       <div className="mb-8 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-4 text-white shadow-lg shadow-blue-200/60">
-        <h2 className="font-semibold tracking-tight">
-          {collapsed ? <Vault className="h-5 w-5" /> : title}
+        <h2 className={`font-semibold tracking-tight ${collapsed ? "flex justify-center" : ""}`}>
+          {collapsed ? <Vault className="h-6 w-6" /> : title}
         </h2>
         {!collapsed && <p className="mt-1 text-xs text-blue-100">{subtitle}</p>}
       </div>
@@ -64,8 +64,8 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
                   : "border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50"
               }`}
             >
-              <span className="flex items-center gap-2">
-                <ItemIcon className="h-4 w-4 shrink-0" />
+              <span className="flex items-center justify-center gap-2">
+                <ItemIcon className="h-5 w-5 shrink-0" />
                 {!collapsed && <span>{item.label}</span>}
               </span>
               {!collapsed && item.count != null && (
