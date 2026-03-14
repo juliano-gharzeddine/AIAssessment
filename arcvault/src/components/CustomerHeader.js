@@ -6,8 +6,8 @@ import { Vault } from "lucide-react";
 
 export default function CustomerHeader({ name }) {
   return (
-    <header className="mb-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <header className="fixed left-0 right-0 top-0 z-50 border-b border-slate-200 bg-white/95 px-6 py-4 shadow-sm backdrop-blur-sm">
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-blue-600 p-2 text-white">
             <Vault className="h-5 w-5" />
@@ -18,7 +18,7 @@ export default function CustomerHeader({ name }) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/" className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+          <Link href="/#my-requests" className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
             My Requests
           </Link>
           <button
