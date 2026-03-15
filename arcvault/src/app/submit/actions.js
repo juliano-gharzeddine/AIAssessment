@@ -5,8 +5,8 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
 
-async function getRequestOrigin() {
-  const headerStore = await headers();
+function getRequestOrigin() {
+  const headerStore = headers();
   const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
   const protocol = headerStore.get("x-forwarded-proto") ?? "https";
 
@@ -42,7 +42,7 @@ export async function submitRequestAction(_, formData) {
     },
   });
 
-  const origin = await getRequestOrigin();
+  const origin = getRequestOrigin();
   if (origin) {
     try {
       await fetch(`${origin}/api/process`, {
