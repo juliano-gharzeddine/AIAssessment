@@ -42,7 +42,7 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
     const baseUrl =
       typeof window !== "undefined"
         ? window.location.origin
-        : process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        : process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     return `${baseUrl}${path}`;
   }
 
