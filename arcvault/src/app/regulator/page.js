@@ -30,7 +30,7 @@ export default async function RegulatorPage({ searchParams }) {
   const view = params?.view === "all" ? "all" : "pending";
   const pendingWhere = {
     status: "PENDING_REVIEW",
-    OR: [{ confidence: { lt: 0.7 } }, { escalationFlag: true }],
+    confidence: { lt: 0.7 },
   };
 
   const where = view === "pending" ? pendingWhere : {};

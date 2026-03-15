@@ -222,6 +222,7 @@ export default function RegulatorClient({ initialRecords, departments }) {
               <th className="px-4 py-3">SOURCE</th>
               <th className="px-4 py-3">ISSUE</th>
               <th className="px-4 py-3">ESCALATION</th>
+              <th className="px-4 py-3">ROUTED TO</th>
               <th className="px-4 py-3">
                 <button onClick={() => toggleSort("submittedAt")} className="flex items-center gap-1 hover:text-blue-600">
                   SUBMITTED <SortIndicator active={sortBy === "submittedAt"} direction={sortDirection} />
@@ -239,20 +240,43 @@ export default function RegulatorClient({ initialRecords, departments }) {
                 <td className="px-4 py-3 text-slate-600">{SOURCE_LABELS[record.request.source] ?? record.request.source}</td>
                 <td className="px-4 py-3 text-slate-700">{record.coreIssue}</td>
                 <td className="px-4 py-3 text-slate-700">{record.escalationReason || "-"}</td>
+                <td className="px-4 py-3">
+                  {record.department?.name ? (
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                      {record.department.name}
+                    </span>
+                  ) : record.status === "PENDING_REVIEW" ? (
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                      Unassigned
+                    </span>
+                  ) : (
+                    <span className="text-xs text-slate-400">-</span>
+                  )}
+                </td>
                 <td className="px-4 py-3"><RelativeTime value={record.request.submittedAt} /></td>
                 <td className="px-4 py-3">
-                  {record.confidence < 0.7 && record.status === "PENDING_REVIEW" ? (
+                  {record.status === "PENDING_REVIEW" ? (
                     <button
                       onClick={(event) => {
                         event.stopPropagation();
                         setActiveRecord(record);
                       }}
-                      className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-medium hover:bg-slate-50"
+                      className="rounded-lg bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
                     >
                       Route
                     </button>
+                  ) : record.status === "AUTO_ROUTED" || record.status === "MANUALLY_ROUTED" ? (
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setActiveRecord(record);
+                      }}
+                      className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      Force Route
+                    </button>
                   ) : (
-                    <span className="text-xs text-slate-400">No action</span>
+                    <span className="text-xs text-slate-400">-</span>
                   )}
                 </td>
               </tr>
