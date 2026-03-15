@@ -37,15 +37,6 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
     return currentPath === item.href;
   }
 
-  // Helper to reliably build auth callback URL
-  function getCallbackUrl(path) {
-    const baseUrl =
-      typeof window !== "undefined"
-        ? window.location.origin
-        : process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    return `${baseUrl}${path}`;
-  }
-
   return (
     <aside
       className={`${collapsed ? "w-24" : "w-80"} sticky top-0 flex h-screen flex-col border-r border-slate-200 bg-white/95 p-4 text-slate-800 shadow-[12px_0_32px_rgba(15,23,42,0.05)] backdrop-blur-md transition-[width] duration-150`}
@@ -98,14 +89,14 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
         {!collapsed && footer}
 
         <button
-          onClick={() => signOut({ callbackUrl: getCallbackUrl("/login?switch=1") })}
+          onClick={() => signOut()}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 hover:border-slate-300 hover:bg-slate-100"
         >
           <Repeat className="h-4 w-4" /> {!collapsed && "Switch Account"}
         </button>
 
         <button
-          onClick={() => signOut({ callbackUrl: getCallbackUrl("/login") })}
+          onClick={() => signOut()}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 hover:border-slate-300 hover:bg-slate-100"
         >
           <LogOut className="h-4 w-4" /> {!collapsed && "Logout"}
