@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { LogOut, Menu, Repeat, ShieldCheck, Building2, ClipboardList, Vault } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -12,16 +12,9 @@ const ICONS = {
   queue: ClipboardList,
 };
 
-// Utility to get absolute base url
-function getBaseUrl() {
-  if (typeof window !== "undefined") {
-    return window.location.origin;
-  }
-  return process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-}
-
 export default function Sidebar({ title, subtitle, items = [], footer }) {
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -29,6 +22,11 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
     const query = searchParams?.toString();
     return query ? `${pathname}?${query}` : pathname;
   }, [pathname, searchParams]);
+
+  async function handleLogout() {
+    await signOut({ redirect: false, redirectTo: "/login" });
+    router.replace("/login");
+  }
 
   function isItemActive(item) {
     if (typeof item.isActive === "function") {
@@ -89,14 +87,14 @@ export default function Sidebar({ title, subtitle, items = [], footer }) {
         {!collapsed && footer}
 
         <button
-          onClick={() => signOut()}
+          onClick={handleLogout}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 hover:border-slate-300 hover:bg-slate-100"
         >
           <Repeat className="h-4 w-4" /> {!collapsed && "Switch Account"}
         </button>
 
         <button
-          onClick={() => signOut()}
+          onClick={handleLogout}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 hover:border-slate-300 hover:bg-slate-100"
         >
           <LogOut className="h-4 w-4" /> {!collapsed && "Logout"}

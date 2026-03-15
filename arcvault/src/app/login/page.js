@@ -19,10 +19,13 @@ function LoginForm() {
     setLoading(true);
     setError("");
 
+    const safeCallbackUrl = callbackUrl?.startsWith("/") ? callbackUrl : null;
+
     const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
+      redirectTo: safeCallbackUrl ?? undefined,
     });
 
     if (result?.error) {
@@ -31,20 +34,20 @@ function LoginForm() {
       return;
     }
 
-    if (callbackUrl?.startsWith("/")) {
-      router.push(callbackUrl);
+    if (safeCallbackUrl) {
+      router.replace(safeCallbackUrl);
       return;
     }
 
-    const res = await fetch("/api/auth/session");
+    const res = await fetch("/api/auth/session", { cache: "no-store" });
     const session = await res.json();
 
     if (session?.user?.role === "REGULATOR") {
-      router.push("/regulator");
+      router.replace("/regulator");
     } else if (session?.user?.role === "DEPARTMENT") {
-      router.push("/department");
+      router.replace("/department");
     } else {
-      router.push("/");
+      router.replace("/");
     }
   }
 
