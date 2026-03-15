@@ -1,7 +1,21 @@
 "use server";
 
+import { headers } from "next/headers";
+
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
+
+function getRequestOrigin() {
+  const headerStore = headers();
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  const protocol = headerStore.get("x-forwarded-proto") ?? "https";
+
+  if (!host) {
+    return null;
+  }
+
+  return `${protocol}://${host}`;
+}
 
 export async function submitRequestAction(_, formData) {
   const session = await auth();
@@ -28,16 +42,18 @@ export async function submitRequestAction(_, formData) {
     },
   });
 
-  const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  try {
-    await fetch(`${baseUrl}/api/process`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ requestId: request.id }),
-      cache: "no-store",
-    });
-  } catch (error) {
-    console.error("Failed to call processing pipeline", error);
+  const origin = getRequestOrigin();
+  if (origin) {
+    try {
+      await fetch(`${origin}/api/process`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId: request.id }),
+        cache: "no-store",
+      });
+    } catch (error) {
+      console.error("Failed to call processing pipeline", error);
+    }
   }
 
   return { success: true, ticketRef: request.id };
