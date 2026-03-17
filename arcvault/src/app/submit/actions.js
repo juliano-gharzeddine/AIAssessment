@@ -1,24 +1,7 @@
 "use server";
 
-import { headers } from "next/headers";
-
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
-
-async function getRequestOrigin() {
-  const headerStore = await headers();
-  const host =
-    headerStore.get("x-forwarded-host") ?? headerStore.get("host");
-  const protocol =
-    headerStore.get("x-forwarded-proto") ??
-    (host?.includes("localhost") ? "http" : "https");
-
-  if (!host) {
-    return null;
-  }
-
-  return `${protocol}://${host}`;
-}
 
 export async function submitRequestAction(_, formData) {
   const session = await auth();
@@ -57,20 +40,20 @@ export async function submitRequestAction(_, formData) {
     },
   });
 
-  const origin = await getRequestOrigin();
-
-  if (origin) {
+  if (process.env.N8N_WEBHOOK_URL) {
     try {
-      await fetch(`${origin}/api/process`, {
+      await fetch(process.env.N8N_WEBHOOK_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ requestId: request.id }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: request.id,
+          source: request.source,
+          rawMessage: request.rawMessage,
+        }),
         cache: "no-store",
       });
     } catch (error) {
-      console.error("Failed to call processing pipeline", error);
+      console.error("Failed to trigger n8n pipeline", error);
     }
   }
 
